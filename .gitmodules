@@ -1,0 +1,16 @@
+[submodule "uboot"]
+	path = uboot
+	url = https://github.com/MarvellEmbeddedProcessors/u-boot-marvell.git
+	branch = u-boot-2018.03-armada-18.09
+[submodule "atf"]
+	path = atf
+	url = https://github.com/MarvellEmbeddedProcessors/atf-marvell.git
+	branch = atf-v1.5-armada-18.09
+[submodule "mv-ddr"]
+	path = mv-ddr
+	url = https://github.com/MarvellEmbeddedProcessors/mv-ddr-marvell.git
+	branch = mv_ddr-armada-18.09
+[submodule "binaries"]
+	path = binaries
+	url = https://github.com/MarvellEmbeddedProcessors/binaries-marvell.git
+	branch = binaries-marvell-armada-18.06
