@@ -1,0 +1,177 @@
+diff --git a/arch/arm/mach-mvebu/Kconfig b/arch/arm/mach-mvebu/Kconfig
+index a38762d..675afda 100644
+--- a/arch/arm/mach-mvebu/Kconfig
++++ b/arch/arm/mach-mvebu/Kconfig
+@@ -72,6 +72,12 @@ config TARGET_CLEARFOG
+ 	bool "Support ClearFog"
+ 	select 88F6820
+ 
++config TARGET_CLEARFOG_GT_8K
++	bool "Support ClearFog GT 8K"
++	select ARMADA_8K
++	select BOARD_LATE_INIT
++	imply SCSI
++
+ config TARGET_MVEBU_ARMADA_37XX
+ 	bool "Support Armada 37xx platforms"
+ 	select ARMADA_3700
+@@ -125,6 +131,7 @@ endchoice
+ 
+ config SYS_BOARD
+ 	default "clearfog" if TARGET_CLEARFOG
++	default "clearfog-gt-8k" if TARGET_CLEARFOG_GT_8K
+ 	default "mvebu_armada-37xx" if TARGET_MVEBU_ARMADA_37XX
+ 	default "db-88f6720" if TARGET_DB_88F6720
+ 	default "db-88f6820-gp" if TARGET_DB_88F6820_GP
+@@ -138,6 +145,7 @@ config SYS_BOARD
+ 
+ config SYS_CONFIG_NAME
+ 	default "clearfog" if TARGET_CLEARFOG
++	default "clearfog-gt-8k" if TARGET_CLEARFOG_GT_8K
+ 	default "mvebu_armada-37xx" if TARGET_MVEBU_ARMADA_37XX
+ 	default "db-88f6720" if TARGET_DB_88F6720
+ 	default "db-88f6820-gp" if TARGET_DB_88F6820_GP
+@@ -157,6 +165,7 @@ config SYS_VENDOR
+ 	default "Marvell" if TARGET_DB_88F6820_AMC
+ 	default "Marvell" if TARGET_MVEBU_ARMADA_8K
+ 	default "solidrun" if TARGET_CLEARFOG
++	default "solidrun" if TARGET_CLEARFOG_GT_8K
+ 	default "Synology" if TARGET_DS414
+ 	default "CZ.NIC" if TARGET_TURRIS_OMNIA
+ 
+diff --git a/board/solidrun/clearfog-gt-8k/MAINTAINERS b/board/solidrun/clearfog-gt-8k/MAINTAINERS
+new file mode 100644
+index 0000000..2551ed0
+--- /dev/null
++++ b/board/solidrun/clearfog-gt-8k/MAINTAINERS
+@@ -0,0 +1,12 @@
++MVEBU_ARMADA_8K BOARD
++M:	Stefan Roese <sr@denx.de>
++S:	Maintained
++F:	board/Marvell/mvebu_armada-8k/
++F:	include/configs/mvebu_armada-8k.h
++F:	configs/mvebu_db_armada8k_defconfig
++
++
++MACCHIATOBin BOARD
++M:	Konstantin Porotchkin <kostap@marvell.com>
++S:	Maintained
++F:	configs/mvebu_mcbin-88f8040_defconfig
+diff --git a/board/solidrun/clearfog-gt-8k/Makefile b/board/solidrun/clearfog-gt-8k/Makefile
+new file mode 100644
+index 0000000..ed39738
+--- /dev/null
++++ b/board/solidrun/clearfog-gt-8k/Makefile
+@@ -0,0 +1,7 @@
++#
++# Copyright (C) 2016 Stefan Roese <sr@denx.de>
++#
++# SPDX-License-Identifier:	GPL-2.0+
++#
++
++obj-y	:= board.o
+diff --git a/board/solidrun/clearfog-gt-8k/board.c b/board/solidrun/clearfog-gt-8k/board.c
+new file mode 100644
+index 0000000..6aef04b
+--- /dev/null
++++ b/board/solidrun/clearfog-gt-8k/board.c
+@@ -0,0 +1,62 @@
++/*
++ * Copyright (C) 2016 Stefan Roese <sr@denx.de>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#include <common.h>
++#include <dm.h>
++#include <i2c.h>
++#include <asm/io.h>
++#include <asm/arch/cpu.h>
++#include <asm/arch/soc.h>
++#include <power/regulator.h>
++#ifdef CONFIG_BOARD_CONFIG_EEPROM
++#include <mvebu/cfg_eeprom.h>
++#endif
++
++DECLARE_GLOBAL_DATA_PTR;
++
++int __soc_early_init_f(void)
++{
++	return 0;
++}
++
++int soc_early_init_f(void)
++			__attribute__((weak, alias("__soc_early_init_f")));
++
++int board_early_init_f(void)
++{
++	soc_early_init_f();
++
++	return 0;
++}
++
++int board_early_init_r(void)
++{
++#ifdef CONFIG_DM_REGULATOR
++	/* Check if any existing regulator should be turned down */
++	regulators_enable_boot_off(false);
++#endif
++
++	return 0;
++}
++
++int board_init(void)
++{
++	/* adress of boot parameters */
++	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
++
++#ifdef CONFIG_BOARD_CONFIG_EEPROM
++	cfg_eeprom_init();
++#endif
++
++	return 0;
++}
++
++int board_late_init(void)
++{
++	/* Pre-configure the USB ports (overcurrent, VBus) */
++
++	return 0;
++}
+diff --git a/include/configs/clearfog-gt-8k.h b/include/configs/clearfog-gt-8k.h
+new file mode 100644
+index 0000000..7ce32b3
+--- /dev/null
++++ b/include/configs/clearfog-gt-8k.h
+@@ -0,0 +1,31 @@
++/*
++ * Copyright (C) 2016 Stefan Roese <sr@denx.de>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#ifndef _CONFIG_MVEBU_ARMADA_8K_H
++#define _CONFIG_MVEBU_ARMADA_8K_H
++
++#define CONFIG_DEFAULT_CONSOLE		"console=ttyS0,115200 "\
++					"earlycon=uart8250,mmio32,0xf0512000"
++
++#include <configs/mvebu_armada-common.h>
++
++/*
++ * High Level Configuration Options (easy to change)
++ */
++#define CONFIG_SYS_TCLK		250000000	/* 250MHz */
++
++#define CONFIG_NR_DRAM_BANKS	2
++
++#define CONFIG_BOARD_EARLY_INIT_R
++
++#define CONFIG_SYS_MAX_NAND_DEVICE	1
++#define CONFIG_SYS_NAND_MAX_CHIPS	1
++#define CONFIG_SYS_NAND_ONFI_DETECTION
++#define CONFIG_SYS_NAND_USE_FLASH_BBT
++
++#define CONFIG_USB_MAX_CONTROLLER_COUNT (3 + 3)
++
++#endif /* _CONFIG_MVEBU_ARMADA_8K_H */
