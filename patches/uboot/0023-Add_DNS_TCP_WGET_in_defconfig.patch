@@ -1,0 +1,11 @@
+diff --git a/configs/mvebu_clearfog_gt_8k-88f8040_defconfig b/configs/mvebu_clearfog_gt_8k-88f8040_defconfig
+index 629d7ac..97f66fc 100644
+--- a/configs/mvebu_clearfog_gt_8k-88f8040_defconfig
++++ b/configs/mvebu_clearfog_gt_8k-88f8040_defconfig
+@@ -111,3 +111,6 @@ CONFIG_LED_GPIO=y
+ # CONFIG_LED_STATUS_GREEN_ENABLE is not set
+ # CONFIG_LED_STATUS_CMD is not set
+ # CONFIG_PCA9551_LED is not set
++CONFIG_CMD_DNS=y
++CONFIG_TCP=y
++CONFIG_CMD_WGET=y
