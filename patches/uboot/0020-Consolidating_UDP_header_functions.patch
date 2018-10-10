@@ -118,3 +118,21 @@ index 3e5461a36a..d5d914bf2a 100644
  
  	icmp->type = ICMP_ECHO_REQUEST;
  	icmp->code = 0;
+diff --git a/net/net.c b/net/net.c
+index 5cf2b3e..37799dc 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1456,11 +1456,12 @@ void net_set_ip_header(uchar *pkt, struct in_addr dest, struct in_addr source,
+ 	ip->ip_id    = htons(net_ip_id++);
+ 	ip->ip_off   = htons(IP_FLAGS_DFRAG);	/* Don't fragment */
+ 	ip->ip_ttl   = 255;
+-	ip->ip_sum   = compute_ip_checksum(ip, IP_HDR_SIZE);
++	ip->ip_sum   = 0;
+ 	/* already in network byte order */
+ 	net_copy_ip((void *)&ip->ip_src, &source);
+ 	/* already in network byte order */
+ 	net_copy_ip((void *)&ip->ip_dst, &dest);
++	ip->ip_sum   = compute_ip_checksum(ip, IP_HDR_SIZE);
+ }
+ 
+ void net_set_udp_header(uchar *pkt, struct in_addr dest, int dport, int sport,
