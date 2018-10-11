@@ -1,0 +1,47 @@
+diff --git a/net/wget.c b/net/wget.c
+index 8238ec5..58256c6 100644
+--- a/net/wget.c
++++ b/net/wget.c
+@@ -12,7 +12,8 @@
+ #include <net/tcp.h>
+ 
+ const char bootfile1[]   = "GET ";
+-const  char bootfile3[]   = " HTTP/1.0\r\n\r\n";
++const char bootfile3[]   = " HTTP/1.0";
++const char http_header_host[] = "HOST: ";
+ const char http_eom[]     = "\r\n\r\n";
+ const char http_ok[]      = "200";
+ const char content_len[]  = "Content-Length";
+@@ -136,6 +138,20 @@ static void wget_send_stored(void)
+ 
+ 		memcpy(offset, &bootfile3, strlen(bootfile3));
+ 		offset = offset + strlen(bootfile3);
++
++		tmp = env_get("servername");
++		if(tmp) {
++			memcpy(offset, &linefeed, strlen(linefeed));
++			offset = offset + strlen(linefeed);
++			memcpy(offset, &http_header_host, strlen(http_header_host)); // "HOST: "
++			offset = offset + strlen(http_header_host);
++			memcpy(offset, tmp, strlen(tmp));
++			offset = offset + strlen(tmp);
++		}
++
++		memcpy(offset, &http_eom, strlen(http_eom));
++		offset = offset + strlen(http_eom);
++
+ 		net_send_tcp_packet((offset - ptr), SERVER_PORT, our_port,
+ 				    TCP_PUSH, tcp_seq_num, tcp_ack_num);
+ 		wget_state = WGET_CONNECTED;
+diff --git a/net/wget.c b/net/wget.c
+index 5877a22..dad048f 100644
+--- a/net/wget.c
++++ b/net/wget.c
+@@ -109,6 +109,7 @@ static void wget_send_stored(void)
+ 	int len                    = retry_len;
+ 	uchar *ptr;
+ 	uchar *offset;
++	char* tmp;
+ 
+ 	tcp_ack_num = tcp_ack_num + len;
+ 
