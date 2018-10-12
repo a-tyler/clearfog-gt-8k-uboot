@@ -10,7 +10,7 @@ export BL33=$ROOT/uboot/u-boot.bin
 
 if [ ! -s toolchain/bin/${CROSS_COMPILE}gcc ]; then
 	echo "Downloading Toolchain :"
-	wget https://releases.linaro.org/components/toolchain/binaries/latest/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz -O toolchain.tar.xz && \
+	wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz -O toolchain.tar.xz && \
 	tar xvf toolchain.tar.xz --strip 1 -C toolchain && \
 	rm -f toolchain.tar.xz
 fi
