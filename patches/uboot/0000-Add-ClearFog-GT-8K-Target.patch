@@ -269,8 +269,8 @@ index b2a2369..ad6104f 100644
 +					"extra_params=pci=pcie_bus_safe\0" \
 +					"run_rescue=run run_led_rescue_start; set autoload no; dhcp && run run_led_rescue_lease && run run_wgetimg && run run_led_rescue_wget && run run_writeimg; run run_rescue\0" \
 +					"run_checkreset=gpio input 126 && run run_rescue\0" \
-+					"servername=plik.root.gg\0" \
-+					"filename=/file/WVkO3YZ5WtOQwTmd/4NBXPqzX3uzR1iyp/latest.img.gz\0" \
++					"servername=downloads.overthebox.net\0" \
++					"filename=/prod/targets/mvebu/cortexa72/solidrun-gt-8k/latest.img.gz\0" \
 +					"run_wgetimg=run run_led_rescue_resolv && dns $servername serverip && setenv serverip $serverip && run run_led_rescue_wget && wget $filename\0" \
 +					"run_writeimg=run run_led_rescue_writeimg && gzwrite mmc 0 $loadaddr $filesize; led green:led0 on; led green:led1 on; sleep 2; reset\0" \
 +					"initrd_addr=0xa00000\0"	\
