@@ -8,7 +8,7 @@ index 8238ec5..58256c6 100644
  const char bootfile1[]   = "GET ";
 -const  char bootfile3[]   = " HTTP/1.0\r\n\r\n";
 +const char bootfile3[]   = " HTTP/1.0";
-+const char http_header_host[] = "HOST: ";
++const char http_header_host[] = "Host: ";
  const char http_eom[]     = "\r\n\r\n";
  const char http_ok[]      = "200";
  const char content_len[]  = "Content-Length";
@@ -21,7 +21,7 @@ index 8238ec5..58256c6 100644
 +		if(tmp) {
 +			memcpy(offset, &linefeed, strlen(linefeed));
 +			offset = offset + strlen(linefeed);
-+			memcpy(offset, &http_header_host, strlen(http_header_host)); // "HOST: "
++			memcpy(offset, &http_header_host, strlen(http_header_host)); // "Host: "
 +			offset = offset + strlen(http_header_host);
 +			memcpy(offset, tmp, strlen(tmp));
 +			offset = offset + strlen(tmp);
