@@ -138,72 +138,6 @@ index 0000000..6aef04b
 +
 +	return 0;
 +}
-diff --git a/include/configs/clearfog-gt-8k.h b/include/configs/clearfog-gt-8k.h
-new file mode 100644
-index 0000000..7ce32b3
---- /dev/null
-+++ b/include/configs/clearfog-gt-8k.h
-@@ -0,0 +1,31 @@
-+/*
-+ * Copyright (C) 2016 Stefan Roese <sr@denx.de>
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
-+ */
-+
-+#ifndef _CONFIG_MVEBU_ARMADA_8K_H
-+#define _CONFIG_MVEBU_ARMADA_8K_H
-+
-+#define CONFIG_DEFAULT_CONSOLE		"console=ttyS0,115200 "\
-+					"earlycon=uart8250,mmio32,0xf0512000"
-+
-+#include <configs/mvebu_armada-common.h>
-+
-+/*
-+ * High Level Configuration Options (easy to change)
-+ */
-+#define CONFIG_SYS_TCLK		250000000	/* 250MHz */
-+
-+#define CONFIG_NR_DRAM_BANKS	2
-+
-+#define CONFIG_BOARD_EARLY_INIT_R
-+
-+#define CONFIG_SYS_MAX_NAND_DEVICE	1
-+#define CONFIG_SYS_NAND_MAX_CHIPS	1
-+#define CONFIG_SYS_NAND_ONFI_DETECTION
-+#define CONFIG_SYS_NAND_USE_FLASH_BBT
-+
-+#define CONFIG_USB_MAX_CONTROLLER_COUNT (3 + 3)
-+
-+#endif /* _CONFIG_MVEBU_ARMADA_8K_H */
-diff --git a/include/configs/clearfog-gt-8k.h b/include/configs/clearfog-gt-8k.h
-index 7ce32b3..b2a2369 100644
---- a/include/configs/clearfog-gt-8k.h
-+++ b/include/configs/clearfog-gt-8k.h
-@@ -10,6 +10,24 @@
- #define CONFIG_DEFAULT_CONSOLE		"console=ttyS0,115200 "\
- 					"earlycon=uart8250,mmio32,0xf0512000"
- 
-+#define CONFIG_EXTRA_ENV_SETTINGS \
-+	"fdtfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
-+	"run_checkreset=gpio input 126 && run run_rescue\0" \
-+	"servername=plik.root.gg\0" \
-+	"filename=/file/WVkO3YZ5WtOQwTmd/4NBXPqzX3uzR1iyp/latest.img.gz\0" \
-+	"run_leds_flash=led green:led0 on; led green:led1 on; sleep $led_period; led green:led0 off; led green:led1 off\0" \
-+	"run_led0_flash=led green:led0 on; sleep $led_period; led green:led0 off\0" \
-+	"run_led1_flash=led green:led1 on; sleep $led_period; led green:led1 off\0" \
-+	"run_led_rescue_lease=set led_period 0.2; run run_led0_flash; sleep 0.5; run run_leds_flash;\0" \
-+	"run_led_rescue_resolv=led green:led0 on; led green:led1 off && sleep 1\0" \
-+	"run_led_rescue_start=set led_period 0.2; run run_leds_flash; sleep 0.5; run run_leds_flash;\0" \
-+	"run_led_rescue_wget=led green:led0 on; led green:led1 off\0" \
-+	"run_led_rescue_write=led green:led0 on; led green:led1 on\0" \
-+	"run_led_rescue_writeimg=led green:led0 off; led green:led1 on\0" \
-+	"run_wgetimg=run run_led_rescue_resolv && dns $servername serverip && setenv serverip $serverip && run run_led_rescue_wget && wget $filename\0" \
-+	"run_writeimg=run run_led_rescue_writeimg && gzwrite mmc 0 $loadaddr $filesize; led green:led0 on; led green:led1 on; sleep 2; reset\0" \
-+	"run_rescue=run run_led_rescue_start; set autoload no; dhcp && run run_led_rescue_lease && run run_wgetimg && run run_led_rescue_wget && run run_writeimg; run run_rescue\0"
-+
- #include <configs/mvebu_armada-common.h>
- 
- /*
 diff --git a/include/configs/mvebu_armada-common.h b/include/configs/mvebu_armada-common.h
 index cc8b99d..c212b94 100644
 --- a/include/configs/mvebu_armada-common.h
@@ -225,30 +159,23 @@ index cc8b99d..c212b94 100644
   * For booting Linux, the board info and command line data
   * have to be in the first 8 MB of memory, since this is
 diff --git a/include/configs/clearfog-gt-8k.h b/include/configs/clearfog-gt-8k.h
-index b2a2369..ad6104f 100644
---- a/include/configs/clearfog-gt-8k.h
+new file mode 100644
+index 0000000..4cce32c
+--- /dev/null
 +++ b/include/configs/clearfog-gt-8k.h
-@@ -10,23 +10,61 @@
- #define CONFIG_DEFAULT_CONSOLE		"console=ttyS0,115200 "\
- 					"earlycon=uart8250,mmio32,0xf0512000"
- 
--#define CONFIG_EXTRA_ENV_SETTINGS \
--	"fdtfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
--	"run_checkreset=gpio input 126 && run run_rescue\0" \
--	"servername=plik.root.gg\0" \
--	"filename=/file/WVkO3YZ5WtOQwTmd/4NBXPqzX3uzR1iyp/latest.img.gz\0" \
--	"run_leds_flash=led green:led0 on; led green:led1 on; sleep $led_period; led green:led0 off; led green:led1 off\0" \
--	"run_led0_flash=led green:led0 on; sleep $led_period; led green:led0 off\0" \
--	"run_led1_flash=led green:led1 on; sleep $led_period; led green:led1 off\0" \
--	"run_led_rescue_lease=set led_period 0.2; run run_led0_flash; sleep 0.5; run run_leds_flash;\0" \
--	"run_led_rescue_resolv=led green:led0 on; led green:led1 off && sleep 1\0" \
--	"run_led_rescue_start=set led_period 0.2; run run_leds_flash; sleep 0.5; run run_leds_flash;\0" \
--	"run_led_rescue_wget=led green:led0 on; led green:led1 off\0" \
--	"run_led_rescue_write=led green:led0 on; led green:led1 on\0" \
--	"run_led_rescue_writeimg=led green:led0 off; led green:led1 on\0" \
--	"run_wgetimg=run run_led_rescue_resolv && dns $servername serverip && setenv serverip $serverip && run run_led_rescue_wget && wget $filename\0" \
--	"run_writeimg=run run_led_rescue_writeimg && gzwrite mmc 0 $loadaddr $filesize; led green:led0 on; led green:led1 on; sleep 2; reset\0" \
--	"run_rescue=run run_led_rescue_start; set autoload no; dhcp && run run_led_rescue_lease && run run_wgetimg && run run_led_rescue_wget && run run_writeimg; run run_rescue\0"
+@@ -0,0 +1,87 @@
++/*
++ * Copyright (C) 2016 Stefan Roese <sr@denx.de>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#ifndef _CONFIG_MVEBU_ARMADA_8K_H
++#define _CONFIG_MVEBU_ARMADA_8K_H
++
++#define CONFIG_DEFAULT_CONSOLE		"console=ttyS0,115200 "\
++					"earlycon=uart8250,mmio32,0xf0512000"
++
 +#define CONFIG_EXTRA_ENV_SETTINGS	"bootcmd=run run_checkreset; "\
 +						"run get_images && " \
 +						"run set_bootargs && " \
@@ -304,6 +231,23 @@ index b2a2369..ad6104f 100644
 +					"run_led_rescue_wget=led green:led0 on; led green:led1 off\0" \
 +					"run_led_rescue_write=led green:led0 on; led green:led1 on\0" \
 +					"run_led_rescue_writeimg=led green:led0 off; led green:led1 on\0"
- 
- #include <configs/mvebu_armada-common.h>
- 
++
++#include <configs/mvebu_armada-common.h>
++
++/*
++ * High Level Configuration Options (easy to change)
++ */
++#define CONFIG_SYS_TCLK		250000000	/* 250MHz */
++
++#define CONFIG_NR_DRAM_BANKS	2
++
++#define CONFIG_BOARD_EARLY_INIT_R
++
++#define CONFIG_SYS_MAX_NAND_DEVICE	1
++#define CONFIG_SYS_NAND_MAX_CHIPS	1
++#define CONFIG_SYS_NAND_ONFI_DETECTION
++#define CONFIG_SYS_NAND_USE_FLASH_BBT
++
++#define CONFIG_USB_MAX_CONTROLLER_COUNT (3 + 3)
++
++#endif /* _CONFIG_MVEBU_ARMADA_8K_H */
